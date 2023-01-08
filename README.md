@@ -1,7 +1,7 @@
 # Python script to summarize Azure blob storage usage
 
-1. Generate json output of all blob files.
-   * Note this is big, 69G, took 8h to export with 20mbps cap
+1. Generate json output of all blob files using Microsoft AzCopy tool.
+   * Note this can be slow, e.g. 180M files, 69G, took 8h to list with 20mbps cap, zipped to 5GB.
 
    1. Download AzCopy from Microsoft - [https://learn.microsoft.com/en-us/azure/storage/common/storage-use-azcopy-v10]
 
@@ -21,12 +21,11 @@
 
           time cat ~/az_list_blob-$(date +%F).json.gz|gunzip| wc -l | sed -e "s/[[:space:]][[:space:]]/ /g" | sed -e 's/^[[:space:]]//g' | numfmt --to=si
 
-   5. Generate report with
+2. Generate report with this python prog
 
           python3 ./report_blob/report_blob.py -i ~/az_list_blob-$(date +%F).json.gz > report-$(date +%F).txt
 
-### Example output (with -t html)
-
+## Example output (with -t html)
 
 <table>
 <thead>
@@ -69,4 +68,4 @@
 </tbody>
 </table>
 
-## The End.
+## The End

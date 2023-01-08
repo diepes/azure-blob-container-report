@@ -4,7 +4,6 @@
 import os
 import sys
 import json
-#import ijson
 import gzip
 #import zipfile
 import time
@@ -12,9 +11,6 @@ import copy
 import argparse
 import pathlib
 from tabulate import tabulate
-#from pprint import pprint
-#from prettyformatter import pprint
-#import yaml
 
 t_start = time.perf_counter()
 d = None
