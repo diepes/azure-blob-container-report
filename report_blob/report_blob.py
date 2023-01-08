@@ -101,7 +101,13 @@ def process_json1(f, args):
     counts=dict()
     for record in f:
         #d = json.loads(data)
-        d = json.loads(record.decode("utf-8"))
+        if not record:
+            print(f"Got empty record {cnt:,=} {record=}", file=sys.stderr)
+            continue
+        d = json.loads(record)
+        if d['MessageType'] != "Info" :
+            print(f"#Read line with {d['MessageType']=} skip it !! {cnt:,=} {record=}", file=sys.stderr)
+            continue
         cnt+=1
         r = process_string_to_dict(d['MessageContent'])
         inc_counts(counts,r)
@@ -113,22 +119,23 @@ def process_json1(f, args):
             print(file=sys.stderr)
             pprint(counts, tablefmt=args.tablefmt, stream=sys.stderr)
             print(f"progress {cnt=:,} time {t:>7.2f}s speed {round(cnt/t):,} /s  run time {round(t/60)}min", file=sys.stderr)
+    print("# Read all records, Printout final results", file=sys.stderr)
     t = time.perf_counter() - t_start
-    #pprint(counts)
     pprint(counts, tablefmt=args.tablefmt, stream=sys.stderr)
     print(f"found {cnt=:,} records. time {t:.2f}s speed {round(cnt/t):,} /s ")
 
 
 
 def process_json_gzip(process_function, args):
-    print(f"#Start with file {args.inputfile}")
+    print(f"#Start with file {args.inputfile}", file=sys.stderr)
     #with zipfile.ZipFile(f_name, "r") as z:
     if ".gz" in args.inputfile.suffixes:
         try:
-            with gzip.open(args.inputfile, "rb") as f:
+            with gzip.open(args.inputfile, "rt") as f:  # rt open as text file
                 process_function(f, args)
         except gzip.BadGzipFile as error:
           print(f'ERROR gzip file error  {args.inputfile=} {error=}')
+          sys.exit(1)
         except EOFError as e:
           print("End-Of-File when reading gzip input")
           sys.exit(1)
